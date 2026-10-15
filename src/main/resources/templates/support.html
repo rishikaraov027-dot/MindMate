@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Help, Crisis Support & Privacy')}"></head>
+<body>
+
+    <header th:replace="~{fragments/layout :: header('support')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main class="wrap" style="padding-top: 35px; padding-bottom: 90px;">
+        <div class="heading">
+            <div>
+                <p class="eyebrow">SAFETY, HELP &amp; ETHICAL BOUNDARIES</p>
+                <h2>You don't have to carry it alone.</h2>
+                <p class="muted">MindMate is a student educational tool. When things feel overwhelming, connecting with real human support is a sign of strength.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a th:href="@{/history}" class="navbtn-ghost">Manage Stored Data ↗</a>
+                <a th:href="@{/dashboard}" class="navbtn-ghost">Dashboard ↗</a>
+            </div>
+        </div>
+
+        <!-- Crisis Urgency Triage Banner -->
+        <div class="panel" style="background: #fff8f8; border: 2px solid #f7cfcf; margin-bottom: 28px; padding: 24px;">
+            <div style="display: flex; gap: 14px; align-items: start;">
+                <span style="font-size: 32px;">🚨</span>
+                <div>
+                    <h3 style="margin: 0 0 6px; font-size: 18px; color: #b8382c;">Immediate Danger or Crisis Support</h3>
+                    <p style="margin: 0 0 12px; font-size: 13px; color: #5a2520; line-height: 1.6;">
+                        If you are experiencing overwhelming distress, having thoughts of harming yourself, or in immediate danger, <strong>please reach out right now</strong>. These services are free, confidential, available 24/7, and staffed by trained compassionate humans.
+                    </p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <a href="https://findahelpline.com/" target="_blank" rel="noopener" class="btn" style="background: #b8382c; font-size: 12px; padding: 8px 16px;">
+                            Global Directory: FindAHelpline.com ↗
+                        </a>
+                        <span class="pill" style="font-weight: 700; background: #fff; border-color: #f5c4c0; color: #b8382c;">
+                            India: Tele-MANAS 14416 | KIRAN 1800-599-0019
+                        </span>
+                        <span class="pill" style="font-weight: 700; background: #fff; border-color: #f5c4c0; color: #b8382c;">
+                            USA &amp; Canada: Dial / Text 988
+                        </span>
+                        <span class="pill" style="font-weight: 700; background: #fff; border-color: #f5c4c0; color: #b8382c;">
+                            UK: Call 111 (NHS) / 116 123
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cols" style="margin-bottom: 30px;">
+            <!-- Left: Verified Crisis & Support Resources -->
+            <div class="panel">
+                <div class="support" style="padding: 16px; margin-bottom: 16px;">
+                    <span class="heart">♡</span>
+                    <div>
+                        <h3 style="margin: 0; font-size: 18px;">Support Resources &amp; Helplines</h3>
+                        <p class="muted small">Free, non-judgmental guidance for students</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; gap: 14px;">
+                    <div style="border-bottom: 1px solid var(--line); padding-bottom: 12px;">
+                        <strong style="font-size: 14px; display: block; color: var(--ink);">Tele-MANAS (Govt. of India)</strong>
+                        <p class="muted small" style="margin: 2px 0 6px;">24/7 national tele-mental health programme across all Indian states in multiple regional languages.</p>
+                        <span class="pill" style="font-size: 12px; font-weight: 700; color: var(--green);">Toll-Free: 14416 or 1800-891-4416</span>
+                    </div>
+
+                    <div style="border-bottom: 1px solid var(--line); padding-bottom: 12px;">
+                        <strong style="font-size: 14px; display: block; color: var(--ink);">KIRAN Mental Health Helpline (India)</strong>
+                        <p class="muted small" style="margin: 2px 0 6px;">24/7 national helpline by Ministry of Social Justice for psychological first-aid and mental well-being.</p>
+                        <span class="pill" style="font-size: 12px; font-weight: 700; color: var(--green);">Toll-Free: 1800-599-0019</span>
+                    </div>
+
+                    <div style="border-bottom: 1px solid var(--line); padding-bottom: 12px;">
+                        <strong style="font-size: 14px; display: block; color: var(--ink);">Campus Student Counseling Services</strong>
+                        <p class="muted small" style="margin: 2px 0 6px;">Most colleges and universities provide free, confidential student counseling, Dean of Students assistance, and peer support programs.</p>
+                        <span class="pill" style="font-size: 12px;">Check your university portal or student wellness center</span>
+                    </div>
+
+                    <div style="padding-bottom: 6px;">
+                        <strong style="font-size: 14px; display: block; color: var(--ink);">Find A Helpline (Worldwide)</strong>
+                        <p class="muted small" style="margin: 2px 0 6px;">Free, confidential support from local crisis centers in 130+ countries.</p>
+                        <a href="https://findahelpline.com/" target="_blank" rel="noopener" class="pill" style="color: var(--green); font-weight: 700;">Visit FindAHelpline.com &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Ethical Disclaimers, Data Transparency & Privacy -->
+            <div>
+                <div class="panel" style="margin-bottom: 24px;">
+                    <h3 style="font-size: 17px; margin: 0 0 10px;">Clinical Boundaries &amp; Scope</h3>
+                    <div style="display: grid; gap: 12px; font-size: 13px; color: #364e44; line-height: 1.6;">
+                        <div style="padding: 10px 12px; background: #fbfdfc; border-left: 3px solid var(--line); border-radius: 6px;">
+                            <strong>No Therapy or Diagnosis:</strong> MindMate is an educational, habit-tracking web tool. It does not provide psychological counseling, psychotherapy, psychiatric diagnosis, or medical treatment.
+                        </div>
+                        <div style="padding: 10px 12px; background: #fbfdfc; border-left: 3px solid var(--line); border-radius: 6px;">
+                            <strong>No Emergency Monitoring:</strong> This software does not monitor messages in real time or alert university officials, police, or emergency dispatchers.
+                        </div>
+                        <div style="padding: 10px 12px; background: #fbfdfc; border-left: 3px solid var(--line); border-radius: 6px;">
+                            <strong>Safety Heuristic:</strong> If keywords related to self-harm or danger are typed, the system immediately provides emergency helpline information.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Storage & Privacy Policy -->
+                <div class="panel" style="background: #f7faf8;">
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 20px;">🛡️</span>
+                        <h3 style="margin: 0; font-size: 16px; color: var(--green-dark);">Your Data &amp; Privacy</h3>
+                    </div>
+                    <ul style="margin: 0 0 14px 18px; padding: 0; font-size: 12px; color: #496357; line-height: 1.7;">
+                        <li><strong>Stored Locally:</strong> All check-ins, journal notes, chat conversations, and goals are persisted in your local SQLite database file (<code>mindmate.db</code>) on your computer.</li>
+                        <li><strong>No Sensitive Profiling:</strong> We do not ask for or collect sensitive clinical history, biometric data, or identity documents.</li>
+                        <li><strong>Export Anytime:</strong> You can download all your check-in records in standard CSV or JSON format on the <a th:href="@{/history}" style="color: var(--green); text-decoration: underline; font-weight: 700;">History page</a>.</li>
+                        <li><strong>Deletion Rights:</strong> You can delete any individual entry or wipe your entire history at any time.</li>
+                    </ul>
+                    <a th:href="@{/history}" class="navbtn-ghost" style="display: block; text-align: center; font-size: 12px; padding: 8px;">
+                        Manage or Delete Stored Entries &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Sign In')}"></head>
+<body>
+
+    <header th:replace="~{fragments/layout :: header('login')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main class="wrap">
+        <div class="auth-container">
+            <div class="auth-panel">
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <span style="font-size: 32px; color: var(--green);">✿</span>
+                    <h2 style="font-size: 24px; margin: 8px 0 4px;">Welcome back</h2>
+                    <p class="muted small">Sign in to your MindMate account</p>
+                </div>
+
+                <form th:action="@{/login}" th:object="${loginForm}" method="post">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input id="username" th:field="*{username}" type="text" required autofocus placeholder="Enter your username">
+                        <p class="form-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Error</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input id="password" th:field="*{password}" type="password" required placeholder="••••••••">
+                        <p class="form-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</p>
+                    </div>
+
+                    <button type="submit" class="btn full">Sign In &rarr;</button>
+                </form>
+
+                <div style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--muted);">
+                    Don't have an account? <a th:href="@{/register}" style="color: var(--green); font-weight: 700; text-decoration: underline;">Create one</a>
+                    <br><br>
+                    <a th:href="@{/}" class="navbtn-ghost" style="display: inline-block;">Continue as Guest &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

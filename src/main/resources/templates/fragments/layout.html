@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title != null ? title + ' — MindMate AI' : 'MindMate AI — Student Well-being Companion'}">MindMate AI</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header Fragment -->
+    <header th:fragment="header(activePage)">
+        <a class="brand" th:href="@{/}">
+            <span>✿</span> MindMate <small>AI</small>
+        </a>
+        
+        <button id="menuBtn" aria-label="Toggle navigation menu">☰</button>
+        
+        <nav id="nav">
+            <a th:href="@{/dashboard}" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">Dashboard</a>
+            <a th:href="@{/#checkin}" th:classappend="${activePage == 'checkin' ? 'active' : ''}">Mood Tracker</a>
+            <a th:href="@{/companion}" th:classappend="${activePage == 'companion' ? 'active' : ''}">AI Companion</a>
+            <a th:href="@{/relaxation}" th:classappend="${activePage == 'relaxation' ? 'active' : ''}">Relaxation</a>
+            <a th:href="@{/goals}" th:classappend="${activePage == 'goals' ? 'active' : ''}">Goals</a>
+            <a th:href="@{/history}" th:classappend="${activePage == 'history' ? 'active' : ''}">History</a>
+            <a th:href="@{/support}" th:classappend="${activePage == 'support' ? 'active' : ''}">Help &amp; Safety</a>
+            <a th:href="@{/settings}" th:classappend="${activePage == 'settings' ? 'active' : ''}">Settings</a>
+            
+            <!-- Auth conditional -->
+            <span th:if="${currentUser != null}" style="font-size: 12px; color: var(--green); font-weight: 700;">
+                👋 <span th:text="${currentUser.displayName}">User</span>
+            </span>
+            <a th:if="${currentUser != null}" th:href="@{/logout}" class="navbtn-ghost">Log out</a>
+            <a th:if="${currentUser == null}" th:href="@{/login}" class="navbtn-ghost">Sign in</a>
+        </nav>
+        
+        <div class="nav-actions">
+            <a class="navbtn" th:href="@{/#checkin}">Check in ↗</a>
+        </div>
+    </header>
+
+    <!-- Global Alerts Fragment -->
+    <div th:fragment="alerts">
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span>✓</span> <span th:text="${successMessage}">Operation successful!</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-error">
+            <span>⚠</span> <span th:text="${errorMessage}">Something went wrong.</span>
+        </div>
+    </div>
+
+    <!-- Footer Fragment -->
+    <footer th:fragment="footer">
+        <a class="brand" th:href="@{/}"><span>✿</span> MindMate <small>AI</small></a>
+        <span>Built with Java Spring Boot, Thymeleaf, SQLite & Google Gemini</span>
+        <a th:href="@{/support}">Crisis Helpline Directory ↗</a>
+    </footer>
+
+</body>
+</html>

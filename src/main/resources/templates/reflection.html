@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reflection Details')}"></head>
+<body>
+
+    <header th:replace="~{fragments/layout :: header('checkin')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main class="wrap" style="padding-top: 40px; padding-bottom: 80px;">
+        <div style="margin-bottom: 24px;">
+            <a th:href="@{/}" class="pill">&larr; Back to Home</a>
+        </div>
+
+        <div class="cols">
+            <!-- Left: Full Reflection -->
+            <div class="panel reflection">
+                <div class="flower">✿</div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <p class="eyebrow" th:text="${checkIn.aiGenerated ? '✨ GEMINI AI REFLECTION' : '🌱 CHECK-IN REFLECTION'}">
+                        CHECK-IN REFLECTION
+                    </p>
+                    <span class="pill" th:text="${#temporals.format(checkIn.createdAt, 'EEE, MMM d, yyyy - HH:mm')}">Date</span>
+                </div>
+
+                <h2 style="font-size: 28px; margin: 10px 0 16px; line-height: 1.25;" th:text="${checkIn.title}">
+                    Make space for yourself.
+                </h2>
+
+                <p style="font-size: 15px; line-height: 1.8; color: #384f45;" th:text="${checkIn.text}">
+                    Your reflection text will be presented here.
+                </p>
+
+                <div class="signal">
+                    <span>Support Signal</span>
+                    <b th:classappend="${checkIn.signalClass}" th:text="${checkIn.signal}">Steady moment</b>
+                </div>
+
+                <div class="tip" style="margin-top: 15px;">
+                    <span>✧</span>
+                    <div>
+                        <strong th:text="${checkIn.tipTitle}">A small reminder</strong>
+                        <p th:text="${checkIn.tipBody}">You don't need to solve everything today.</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+                    <a th:href="@{'/reflection/' + ${checkIn.id} + '/download'}" class="btn" style="flex: 1;">
+                        💾 Download Reflection JSON &rarr;
+                    </a>
+                    <a th:href="@{/dashboard}" class="btn light">
+                        View in Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Check-in Details & Notes -->
+            <div class="panel">
+                <div class="row">
+                    <div>
+                        <h3>Logged Metrics</h3>
+                        <p class="muted small">Values saved in SQLite</p>
+                    </div>
+                    <span class="pill" th:text="'ID #' + ${checkIn.id}">#1</span>
+                </div>
+
+                <div style="display: grid; gap: 14px; margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Overall Mood</span>
+                        <span class="pill" th:text="${(checkIn.moodEmoji != null ? checkIn.moodEmoji : '😐') + ' ' + (checkIn.moodLabel != null ? checkIn.moodLabel : 'Okay') + ' (' + checkIn.moodScore + ' / 5)'}">😐 Okay (3 / 5)</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Stress Level</span>
+                        <span class="pill" th:text="${checkIn.stress} + ' / 10'">5 / 10</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Hours of Sleep</span>
+                        <span class="pill" th:text="${checkIn.sleep} + ' hours'">7 hours</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Study Workload</span>
+                        <span class="pill" th:text="${checkIn.workload} + ' / 10'">6 / 10</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Energy Level</span>
+                        <span class="pill" th:text="${checkIn.energy} + ' / 10'">6 / 10</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Connection Feeling</span>
+                        <span class="pill" th:text="${checkIn.connection} + ' / 10'">6 / 10</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <strong style="font-size: 12px; color: #4b6356; display: block; margin-bottom: 6px;">Your Notes</strong>
+                    <div style="background: #f7faf8; border: 1px solid var(--line); border-radius: 12px; padding: 14px; font-size: 13px; min-height: 80px; color: #2e433b;">
+                        <span th:if="${checkIn.notes != null and !checkIn.notes.isBlank()}" th:text="${checkIn.notes}">None</span>
+                        <em th:unless="${checkIn.notes != null and !checkIn.notes.isBlank()}" style="color: #9aa49e;">No notes recorded for this check-in.</em>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: center;">
+                    <form th:action="@{'/checkin/' + ${checkIn.id} + '/delete'}" method="post" onsubmit="return confirm('Delete this check-in record?');">
+                        <button type="submit" class="btn danger" style="padding: 8px 14px; font-size: 12px;">Delete Record</button>
+                    </form>
+                    <a th:href="@{/#checkin}" class="navbtn-ghost">Start New Check-in</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

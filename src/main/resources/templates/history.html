@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Check-in History & Reports')}"></head>
+<body>
+
+    <header th:replace="~{fragments/layout :: header('history')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main class="wrap" style="padding-top: 35px; padding-bottom: 90px;">
+        <div class="heading">
+            <div>
+                <p class="eyebrow">YOUR CHRONOLOGICAL ARCHIVE</p>
+                <h2>Check-in History &amp; Reports</h2>
+                <p class="muted">Review previous entries, monitor patterns over time, and export your personal data.</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a th:href="@{/history/export/csv}" class="btn light" style="font-size: 13px;">
+                    📥 Export CSV
+                </a>
+                <a th:href="@{/history/export/json}" class="btn light" style="font-size: 13px;">
+                    📦 Export Full JSON
+                </a>
+                <a th:href="@{/#checkin}" class="navbtn">
+                    + New Check-in
+                </a>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="panel" th:if="${#lists.isEmpty(checkIns)}" style="text-align: center; padding: 60px 20px; margin-bottom: 30px;">
+            <div style="font-size: 48px; margin-bottom: 14px;">📖</div>
+            <h3 style="margin: 0 0 8px; font-size: 20px;">No Check-in History Recorded Yet</h3>
+            <p class="muted" style="max-width: 440px; margin: 0 auto 24px; font-size: 14px;">
+                Your entries will appear here once you complete a daily check-in. All information is saved locally in your SQLite database.
+            </p>
+            <a th:href="@{/#checkin}" class="btn">
+                Record Today's First Check-in &rarr;
+            </a>
+        </div>
+
+        <!-- History Log Entries -->
+        <div th:unless="${#lists.isEmpty(checkIns)}">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <span class="pill" th:text="${totalCount} + ' total entries recorded'">0 entries</span>
+                
+                <form th:action="@{/history/clear}" method="post" onsubmit="return confirm('Are you sure you want to delete all historical check-in records? This action cannot be undone.');" style="margin: 0;">
+                    <button type="submit" class="navbtn-ghost" style="color: #c4382c; font-size: 11px;">
+                        🗑️ Delete All History Records
+                    </button>
+                </form>
+            </div>
+
+            <div style="display: grid; gap: 18px; margin-bottom: 35px;">
+                <article class="panel history-entry-card" th:each="c : ${checkIns}" style="padding: 24px; border: 1px solid var(--line); background: #fff;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 24px;" th:text="${c.moodEmoji != null ? c.moodEmoji : '😐'}">😐</span>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 17px; color: var(--ink);">
+                                        Mood: <span th:text="${c.moodLabel != null ? c.moodLabel : 'Okay'}">Okay</span>
+                                        <small class="muted" style="font-weight: normal; font-size: 12px;" th:text="'(' + ${c.moodScore} + ' / 5)'">(3/5)</small>
+                                    </h4>
+                                    <span class="muted tiny" th:text="${#temporals.format(c.createdAt, 'EEEE, MMMM d, yyyy · HH:mm')}">Date</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span class="pill" th:classappend="${c.signalClass}" th:text="${c.signal}">Steady</span>
+                            <span class="pill pill-ai" th:if="${c.aiGenerated}">Gemini</span>
+                            <span class="pill" th:unless="${c.aiGenerated}">Local</span>
+                        </div>
+                    </div>
+
+                    <!-- 5 Metric Badges -->
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
+                        <span class="pill" style="font-size: 12px; background: #fff4ed; border-color: #f7d2b8;">
+                            Stress: <strong th:text="${c.stress} + '/10'">5/10</strong>
+                        </span>
+                        <span class="pill" style="font-size: 12px; background: #edf4fb; border-color: #c9def3;">
+                            Sleep: <strong th:text="${c.sleep} + ' hrs'">7 hrs</strong>
+                        </span>
+                        <span class="pill" style="font-size: 12px; background: #fdf5e9; border-color: #fae1ba;">
+                            Workload: <strong th:text="${c.workload} + '/10'">6/10</strong>
+                        </span>
+                        <span class="pill" style="font-size: 12px; background: #edf7f1; border-color: #c7ebd3;">
+                            Energy: <strong th:text="${c.energy} + '/10'">6/10</strong>
+                        </span>
+                        <span class="pill" style="font-size: 12px; background: #f3f1f9; border-color: #ddd8f2;">
+                            Connection: <strong th:text="${c.connection} + '/10'">6/10</strong>
+                        </span>
+                    </div>
+
+                    <!-- Journal Notes (if provided) -->
+                    <div th:if="${c.notes != null and !c.notes.isBlank()}" style="margin-bottom: 16px; padding: 12px 14px; background: #fbfdfc; border-left: 3px solid var(--green); border-radius: 6px;">
+                        <strong style="font-size: 11px; text-transform: uppercase; color: var(--green-dark); display: block; margin-bottom: 4px;">Journal Entry:</strong>
+                        <p style="margin: 0; font-size: 13px; color: #2e433b; line-height: 1.6;" th:text="${c.notes}">Journal text</p>
+                    </div>
+
+                    <!-- Reflection Summary Snippet -->
+                    <div style="font-size: 13px; color: #496357; margin-bottom: 16px; line-height: 1.6;">
+                        <strong th:text="${c.title}">Reflection Title</strong> — <span th:text="${c.text}">Reflection text</span>
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 14px; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; gap: 8px;">
+                            <a th:href="@{'/reflection/' + ${c.id}}" class="navbtn-ghost" style="font-size: 12px; padding: 5px 12px;">
+                                View Full Reflection &rarr;
+                            </a>
+                            <a th:href="@{'/reflection/' + ${c.id} + '/download'}" class="navbtn-ghost" style="font-size: 12px; padding: 5px 12px;">
+                                Download JSON
+                            </a>
+                        </div>
+
+                        <form th:action="@{'/checkin/' + ${c.id} + '/delete'}" method="post" onsubmit="return confirm('Delete this check-in entry?');" style="margin: 0;">
+                            <input type="hidden" name="redirect" value="history">
+                            <button type="submit" class="navbtn-ghost" style="color: #b84438; font-size: 12px; padding: 5px 10px;">
+                                Delete Record &times;
+                            </button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <!-- Privacy & Data Governance Section -->
+        <div class="panel" style="background: #f7faf8; border: 1px solid var(--line);">
+            <div style="display: flex; align-items: start; gap: 14px;">
+                <span style="font-size: 26px;">🔒</span>
+                <div>
+                    <h4 style="margin: 0 0 6px; font-size: 15px; color: var(--green-dark);">Safety, Privacy &amp; Data Control</h4>
+                    <p style="margin: 0 0 10px; font-size: 12px; color: #496357; line-height: 1.7;">
+                        MindMate AI respects your privacy completely. All entries, journal notes, and habit goals are stored solely in your local <code>mindmate.db</code> SQLite database on your own device. Nothing is sent to marketing networks or third-party servers.
+                    </p>
+                    <p style="margin: 0; font-size: 12px; color: #496357; line-height: 1.7;">
+                        You have total authority over your records: download them anytime in portable CSV or JSON format, or delete specific entries using the individual delete buttons above.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

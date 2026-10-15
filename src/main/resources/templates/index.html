@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Home')}"></head>
+<body>
+
+    <!-- Gemini API Status Banner -->
+    <div class="banner banner-gemini-on" th:if="${geminiConfigured}">
+        <span>✨ <strong>Gemini AI Active:</strong> Running on Google <span th:text="${geminiModel}">gemini-1.5-flash</span> with SQLite storage.</span>
+        <a th:href="@{/settings}">Configure &rarr;</a>
+    </div>
+    <div class="banner banner-gemini-off" th:unless="${geminiConfigured}">
+        <span>🌿 <strong>Demo / Algorithmic Mode:</strong> Add your Gemini API key in <a th:href="@{/settings}">Settings</a> for live generative AI responses.</span>
+        <a th:href="@{/settings}">Set Key &rarr;</a>
+    </div>
+
+    <!-- Header -->
+    <header th:replace="~{fragments/layout :: header('checkin')}"></header>
+
+    <!-- Global Alerts -->
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero wrap" id="home">
+            <div>
+                <p class="eyebrow">YOUR WELL-BEING MATTERS</p>
+                <h1>A little check-in.<br><em>A little more you.</em></h1>
+                <p class="muted lead">A gentle space for students to understand their day, notice patterns in SQLite, and find small steps powered by Google Gemini AI.</p>
+                <a class="btn" href="#checkin">Start today's check-in &rarr;</a>
+                <p class="soft">♡ Small steps count. Every day.</p>
+            </div>
+            
+            <div class="art">
+                <div class="sun"></div>
+                <div class="plant">✿</div>
+                <div class="person">
+                    <div class="hair"></div>
+                    <div class="face"><i></i><i></i><b></b></div>
+                    <div class="body"></div>
+                </div>
+                <div class="float f1">
+                    ☁ <strong>Take a breath.</strong>
+                    <small>You don't have to do it all at once.</small>
+                </div>
+                <div class="float f2">
+                    Today's reminder
+                    <strong>Progress, not perfection ✨</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features wrap">
+            <article>
+                ♡ <span><strong>Check in with yourself</strong><small>Notice how you're feeling</small></span>
+            </article>
+            <article>
+                ⌁ <span><strong>Spot your patterns</strong><small>Stored securely in SQLite</small></span>
+            </article>
+            <article>
+                ✧ <span><strong>Gemini AI Guidance</strong><small>Personalized next steps</small></span>
+            </article>
+        </section>
+
+        <!-- Daily Pause / Check-in Form -->
+        <section class="wrap section" id="checkin">
+            <div class="heading">
+                <div>
+                    <p class="eyebrow">YOUR DAILY PAUSE</p>
+                    <h2>How are you, really?</h2>
+                    <p class="muted">There are no right or wrong answers. Choose what feels true for you today.</p>
+                </div>
+                <span class="pill" th:text="${currentDate}">Today</span>
+            </div>
+
+            <div class="cols">
+                <!-- Check-in Form (Spring MVC POST) -->
+                <form class="panel" id="checkForm" th:action="@{/checkin}" th:object="${checkInForm}" method="post">
+                    <div class="row">
+                        <div>
+                            <h3>Daily Well-being Check-in</h3>
+                            <p class="muted small">Takes about 60 seconds · Logged in SQLite</p>
+                        </div>
+                        <span class="pill">Mood &amp; Metrics</span>
+                    </div>
+
+                    <!-- Step 1: Emoji Mood Tracker -->
+                    <div class="mood-tracker-group">
+                        <label class="field-label">How would you describe your overall mood right now?</label>
+                        <input type="hidden" id="moodScore" th:field="*{moodScore}">
+                        <input type="hidden" id="moodEmoji" th:field="*{moodEmoji}">
+                        <input type="hidden" id="moodLabel" th:field="*{moodLabel}">
+
+                        <div class="emoji-grid" role="radiogroup" aria-label="Mood selector">
+                            <button type="button" class="mood-chip" data-score="1" data-emoji="😢" data-label="Struggling" th:classappend="${checkInForm.moodScore == 1 ? 'selected' : ''}">
+                                <span class="mood-icon">😢</span>
+                                <span class="mood-text">Struggling</span>
+                                <small>1 / 5</small>
+                            </button>
+                            <button type="button" class="mood-chip" data-score="2" data-emoji="😕" data-label="Low" th:classappend="${checkInForm.moodScore == 2 ? 'selected' : ''}">
+                                <span class="mood-icon">😕</span>
+                                <span class="mood-text">Low</span>
+                                <small>2 / 5</small>
+                            </button>
+                            <button type="button" class="mood-chip" data-score="3" data-emoji="😐" data-label="Okay" th:classappend="${checkInForm.moodScore == 3 ? 'selected' : ''}">
+                                <span class="mood-icon">😐</span>
+                                <span class="mood-text">Okay</span>
+                                <small>3 / 5</small>
+                            </button>
+                            <button type="button" class="mood-chip" data-score="4" data-emoji="🙂" data-label="Good" th:classappend="${checkInForm.moodScore == 4 ? 'selected' : ''}">
+                                <span class="mood-icon">🙂</span>
+                                <span class="mood-text">Good</span>
+                                <small>4 / 5</small>
+                            </button>
+                            <button type="button" class="mood-chip" data-score="5" data-emoji="😄" data-label="Great" th:classappend="${checkInForm.moodScore == 5 ? 'selected' : ''}">
+                                <span class="mood-icon">😄</span>
+                                <span class="mood-text">Great</span>
+                                <small>5 / 5</small>
+                            </button>
+                        </div>
+                        <p class="muted tiny" style="margin-top: 6px;">Selected: <strong id="selectedMoodDisplay" th:text="${checkInForm.moodEmoji + ' ' + checkInForm.moodLabel + ' (' + checkInForm.moodScore + '/5)'}">😐 Okay (3/5)</strong></p>
+                    </div>
+
+                    <div class="range">
+                        <label for="stress">
+                            Stress level <output id="stressOut" th:text="${checkInForm.stress} + ' / 10'">5 / 10</output>
+                        </label>
+                        <input id="stress" th:field="*{stress}" type="range" min="1" max="10">
+                        <div class="ends"><span>Calm</span><span>Overwhelmed</span></div>
+                    </div>
+
+                    <div class="range">
+                        <label for="sleep">
+                            Hours of sleep <output id="sleepOut" th:text="${checkInForm.sleep} + ' hours'">7 hours</output>
+                        </label>
+                        <input id="sleep" th:field="*{sleep}" type="range" min="1" max="12">
+                        <div class="ends"><span>Very little</span><span>Well rested</span></div>
+                    </div>
+
+                    <div class="range">
+                        <label for="workload">
+                            Study workload <output id="workloadOut" th:text="${checkInForm.workload} + ' / 10'">6 / 10</output>
+                        </label>
+                        <input id="workload" th:field="*{workload}" type="range" min="1" max="10">
+                        <div class="ends"><span>Manageable</span><span>Too much</span></div>
+                    </div>
+
+                    <div class="range">
+                        <label for="energy">
+                            Energy today <output id="energyOut" th:text="${checkInForm.energy} + ' / 10'">6 / 10</output>
+                        </label>
+                        <input id="energy" th:field="*{energy}" type="range" min="1" max="10">
+                        <div class="ends"><span>Low</span><span>Full of energy</span></div>
+                    </div>
+
+                    <div class="range">
+                        <label for="connection">
+                            Feeling connected <output id="connectionOut" th:text="${checkInForm.connection} + ' / 10'">6 / 10</output>
+                        </label>
+                        <input id="connection" th:field="*{connection}" type="range" min="1" max="10">
+                        <div class="ends"><span>Alone</span><span>Supported</span></div>
+                    </div>
+
+                    <label class="noteslabel" for="notes">Optional Journal Entry <small>A deadline, a personal win, or anything on your mind...</small></label>
+                    <textarea id="notes" th:field="*{notes}" rows="3" placeholder="Write a few lines to process your day without judgment..."></textarea>
+
+                    <button class="btn full" type="submit">Reflect on my check-in &rarr;</button>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; color: var(--muted);">
+                        <span>🔒 Local SQLite Database</span>
+                        <a th:href="@{/relaxation}" style="color: var(--green); font-weight: 600;">Take a 2-min Breathing Break &rarr;</a>
+                    </div>
+                </form>
+
+                <!-- Reflection Card (MVC Server-side + Latest record) -->
+                <aside class="panel reflection" id="reflection">
+                    <div class="flower">✿</div>
+                    <p class="eyebrow" th:text="${latest != null && latest.aiGenerated ? 'GEMINI AI REFLECTION' : 'YOUR REFLECTION'}">YOUR REFLECTION</p>
+                    
+                    <h3 id="resultTitle" th:text="${latest != null ? latest.title : 'Make space for yourself.'}">
+                        Make space for yourself.
+                    </h3>
+                    
+                    <p class="muted" id="resultText" th:text="${latest != null ? latest.text : 'Complete your check-in above to see a gentle reflection generated for your day.'}">
+                        Complete your check-in above to see a gentle reflection based on the numbers you chose.
+                    </p>
+                    
+                    <div class="signal">
+                        <span>Today's support signal</span>
+                        <b id="signal" 
+                           th:classappend="${latest != null ? latest.signalClass : ''}"
+                           th:text="${latest != null ? latest.signal : 'Waiting for check-in'}">
+                            Waiting for check-in
+                        </b>
+                    </div>
+                    
+                    <div class="tip">
+                        <span>✧</span>
+                        <div>
+                            <strong id="tipTitle" th:text="${latest != null ? latest.tipTitle : 'A small reminder'}">A small reminder</strong>
+                            <p id="tipText" th:text="${latest != null ? latest.tipBody : 'Take things one manageable step at a time. Every small effort counts.'}">
+                                You don't need to solve everything today. Start with one manageable thing.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${latest != null}">
+                        <a th:href="@{'/reflection/' + ${latest.id}}" class="btn full light">
+                            View Full Reflection & Download &rarr;
+                        </a>
+                    </div>
+                    <div th:if="${latest == null}">
+                        <button class="btn light full" type="button" disabled style="opacity: 0.6;">
+                            Complete check-in to unlock reflection
+                        </button>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- Dashboard Snapshot (Server-rendered via Spring MVC from SQLite) -->
+        <section class="dash">
+            <div class="wrap section" id="dashboard">
+                <div class="heading">
+                    <div>
+                        <p class="eyebrow">YOUR PERSONAL SPACE</p>
+                        <h2>Patterns, not pressure.</h2>
+                        <p class="muted">Notice what helps you feel more balanced over time.</p>
+                    </div>
+                    <div>
+                        <a th:href="@{/dashboard}" class="pill">VIEW FULL DASHBOARD &rarr;</a>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <article class="panel stat">
+                        <span>♡</span>
+                        <small>Total SQLite Check-ins</small>
+                        <strong th:text="${stats.totalCount}">0</strong>
+                        <p>Each reflection is a step</p>
+                    </article>
+
+                    <article class="panel stat">
+                        <span>☾</span>
+                        <small>Latest sleep</small>
+                        <strong><span th:text="${stats.latestSleep}">—</span></strong>
+                        <p>Rest is part of progress</p>
+                    </article>
+
+                    <article class="panel stat">
+                        <span>☀</span>
+                        <small>Latest stress</small>
+                        <strong><span th:text="${stats.latestStress}">—</span></strong>
+                        <p>Notice changes over time</p>
+                    </article>
+
+                    <!-- Chart Card -->
+                    <article class="panel chart">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Your check-in snapshot</h3>
+                                <p class="muted small">Stress level timeline calculated directly from SQLite records</p>
+                            </div>
+                            <span class="pill pill-ai" th:if="${stats.totalCount > 0}">Active Trend</span>
+                        </div>
+                        
+                        <svg id="chart" viewBox="0 0 540 170" role="img" aria-label="Stress history chart">
+                            <g class="grid">
+                                <line x1="30" y1="20" x2="525" y2="20" />
+                                <line x1="30" y1="60" x2="525" y2="60" />
+                                <line x1="30" y1="100" x2="525" y2="100" />
+                                <line x1="30" y1="140" x2="525" y2="140" />
+                            </g>
+                            <polyline id="line" th:attr="points=${stats.chartPolylinePoints}" />
+                            <g id="dots">
+                                <circle th:each="dot : ${stats.chartDots}" 
+                                        th:attr="cx=${dot.cx},cy=${dot.cy}" r="4">
+                                    <title th:text="'Stress: ' + ${dot.value} + ' on ' + ${dot.date}"></title>
+                                </circle>
+                                <text th:each="dot : ${stats.chartDots}"
+                                      th:attr="x=${dot.cx},y=160" font-size="9" fill="#7b8982" text-anchor="middle" font-weight="600"
+                                      th:text="${#strings.length(dot.date) >= 6 ? #strings.substring(dot.date, 0, 6) : dot.date}"></text>
+                            </g>
+                            <text x="4" y="24" font-size="9" fill="#889890" font-weight="600">10</text>
+                            <text x="4" y="64" font-size="9" fill="#889890">7</text>
+                            <text x="4" y="104" font-size="9" fill="#889890">4</text>
+                            <text x="4" y="144" font-size="9" fill="#889890" font-weight="600">1</text>
+                        </svg>
+                        <p class="tiny">Persisted safely in SQLite database (mindmate.db).</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Companion Section -->
+        <section class="wrap section companion" id="companion">
+            <div>
+                <p class="eyebrow">A FRIENDLY SPACE TO REFLECT</p>
+                <h2>Sometimes, you just need a place to start.</h2>
+                <p class="muted">Choose a prompt or type below to talk with MindMate Companion powered by Gemini AI.</p>
+                
+                <div class="prompts">
+                    <button class="chip-btn" type="button" data-prompt="I'm feeling stressed about college">“I'm feeling stressed about college.” ↗</button>
+                    <button class="chip-btn" type="button" data-prompt="I can't focus today">“I can't focus today.” ↗</button>
+                    <button class="chip-btn" type="button" data-prompt="I feel lonely">“I feel lonely.” ↗</button>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <a th:href="@{/companion}" class="btn light">Open Full Screen Chat &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Chat Panel -->
+            <div class="panel chat">
+                <div class="chathead">
+                    <div class="chathead-left">
+                        <span>✿</span>
+                        <div>
+                            <strong>MindMate companion</strong>
+                            <small th:text="${geminiConfigured ? '● Powered by Gemini AI' : '● Gentle Support · Algorithmic'}">● Gentle support</small>
+                        </div>
+                    </div>
+                    <form th:action="@{/companion/clear}" method="post">
+                        <button type="submit" class="navbtn-ghost" style="padding: 4px 10px; font-size: 11px;">Clear</button>
+                    </form>
+                </div>
+
+                <div id="messages" class="messages">
+                    <p class="bot">Hi there 🌱 I'm here to help you pause and reflect. What's on your mind?</p>
+                </div>
+
+                <form id="chatForm" class="chatform">
+                    <input id="chatInput" maxlength="240" placeholder="Type a thought or choose a prompt..." aria-label="Your message">
+                    <button type="submit" aria-label="Send">↑</button>
+                </form>
+                <p class="tiny center" style="margin: 6px 0;">Empathetic listener · Not a crisis or medical service</p>
+            </div>
+        </section>
+
+        <!-- Support Section -->
+        <section class="wrap section" id="support">
+            <div class="support">
+                <span class="heart">♡</span>
+                <div>
+                    <p class="eyebrow">YOU DON'T HAVE TO DO IT ALONE</p>
+                    <h2>Reaching out is a strength.</h2>
+                    <p class="muted">Consider talking with someone you trust, a college counsellor, or a qualified mental health professional.</p>
+                </div>
+                <a class="btn dark" th:href="@{/support}">Find support &rarr;</a>
+            </div>
+            <p class="safety">
+                <strong>Safety note:</strong> MindMate is an educational well-being project, not a diagnostic tool or substitute for professional psychiatric care. If you may hurt yourself or are in immediate danger, please contact local emergency services immediately.
+            </p>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

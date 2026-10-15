@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Well-being Dashboard')}"></head>
+<body>
+
+    <header th:replace="~{fragments/layout :: header('dashboard')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main class="wrap" style="padding-top: 35px; padding-bottom: 90px;">
+        <div class="heading">
+            <div>
+                <p class="eyebrow">STUDENT WELL-BEING DASHBOARD</p>
+                <h2>Patterns, not pressure.</h2>
+                <p class="muted">Real metrics persisted locally in SQLite to help you build sustainable balance.</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a th:href="@{/#checkin}" class="navbtn">+ New Check-in</a>
+                <a th:href="@{/relaxation}" class="navbtn-ghost">Guided Breathing 🫁</a>
+                <a th:href="@{/goals}" class="navbtn-ghost">Daily Goals 🌱</a>
+            </div>
+        </div>
+
+        <!-- 5 Core Well-being Indicator Cards -->
+        <div class="stats-indicators-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <!-- Mood Card -->
+            <article class="panel stat">
+                <span class="indicator-icon" th:text="${stats.latestMoodEmoji}">😐</span>
+                <small>Current Mood</small>
+                <strong style="font-size: 22px;" th:text="${stats.latestMoodLabel}">—</strong>
+                <p>Avg: <span th:text="${stats.averageMood}">0.0</span> / 5</p>
+            </article>
+
+            <!-- Stress Card -->
+            <article class="panel stat">
+                <span class="indicator-icon">☀</span>
+                <small>Stress Level</small>
+                <strong style="font-size: 22px;" th:text="${stats.latestStress}">—</strong>
+                <p>Avg: <span th:text="${stats.averageStress}">0.0</span> / 10</p>
+            </article>
+
+            <!-- Sleep Card -->
+            <article class="panel stat">
+                <span class="indicator-icon">☾</span>
+                <small>Nightly Sleep</small>
+                <strong style="font-size: 22px;" th:text="${stats.latestSleep}">—</strong>
+                <p>Avg: <span th:text="${stats.averageSleep}">0.0</span> hrs</p>
+            </article>
+
+            <!-- Energy Card -->
+            <article class="panel stat">
+                <span class="indicator-icon">⚡</span>
+                <small>Energy Level</small>
+                <strong style="font-size: 22px;" th:text="${stats.latestEnergy}">—</strong>
+                <p>Avg: <span th:text="${stats.averageEnergy}">0.0</span> / 10</p>
+            </article>
+
+            <!-- Workload Card -->
+            <article class="panel stat">
+                <span class="indicator-icon">📚</span>
+                <small>Study Workload</small>
+                <strong style="font-size: 22px;" th:text="${stats.latestWorkload}">—</strong>
+                <p>Avg: <span th:text="${stats.averageWorkload}">0.0</span> / 10</p>
+            </article>
+        </div>
+
+        <!-- Changes Over Time Comparison Banner -->
+        <div class="panel comparison-card" style="margin-bottom: 24px; background: #fdfefe; border-left: 4px solid var(--green);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="margin: 0; font-size: 15px; color: var(--ink);">
+                    📈 Changes Over Time <small style="font-size: 12px; color: var(--muted); font-weight: normal;">(Compared to previous entry)</small>
+                </h4>
+                <span class="pill" th:if="${stats.hasPreviousComparison}">2+ Entries Tracked</span>
+                <span class="pill" th:unless="${stats.hasPreviousComparison}">Baseline Entry</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; font-size: 13px;">
+                <div style="padding: 10px 14px; background: #f5f9f6; border-radius: 10px;">
+                    <span style="color: var(--muted); display: block; font-size: 11px; text-transform: uppercase;">Stress Delta</span>
+                    <strong th:text="${stats.stressChangeText}" th:style="${stats.stressChangeDirection == 'improved' ? 'color: var(--green);' : (stats.stressChangeDirection == 'increased' ? 'color: var(--accent);' : '')}">
+                        Equal to previous check-in
+                    </strong>
+                </div>
+                <div style="padding: 10px 14px; background: #f5f9f6; border-radius: 10px;">
+                    <span style="color: var(--muted); display: block; font-size: 11px; text-transform: uppercase;">Sleep Delta</span>
+                    <strong th:text="${stats.sleepChangeText}">Same sleep duration</strong>
+                </div>
+                <div style="padding: 10px 14px; background: #f5f9f6; border-radius: 10px;">
+                    <span style="color: var(--muted); display: block; font-size: 11px; text-transform: uppercase;">Energy Delta</span>
+                    <strong th:text="${stats.energyChangeText}">Steady energy level</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi-Metric Weekly Trend Chart -->
+        <div class="panel" style="margin-bottom: 30px;">
+            <div class="chart-head" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 18px;">Weekly Trends &amp; Multi-Metric Trajectory</h3>
+                    <p class="muted small" style="margin: 4px 0 0;">Chronological history of Stress, Sleep, and Energy from SQLite</p>
+                </div>
+                <div class="chart-legend" style="display: flex; gap: 14px; font-size: 12px; align-items: center;">
+                    <span style="display: flex; align-items: center; gap: 5px;">
+                        <i style="display: inline-block; width: 12px; height: 3px; background: #e28743; border-radius: 2px;"></i> Stress (1-10)
+                    </span>
+                    <span style="display: flex; align-items: center; gap: 5px;">
+                        <i style="display: inline-block; width: 12px; height: 3px; background: #5a82a6; border-radius: 2px;"></i> Sleep (hrs)
+                    </span>
+                    <span style="display: flex; align-items: center; gap: 5px;">
+                        <i style="display: inline-block; width: 12px; height: 3px; background: #497e6b; border-radius: 2px;"></i> Energy (1-10)
+                    </span>
+                </div>
+            </div>
+
+            <svg id="chart" viewBox="0 0 540 170" role="img" aria-label="Multi-metric well-being chart" style="width: 100%; max-height: 230px; margin-top: 15px;">
+                <g class="grid">
+                    <line x1="30" y1="20" x2="525" y2="20" />
+                    <line x1="30" y1="60" x2="525" y2="60" />
+                    <line x1="30" y1="100" x2="525" y2="100" />
+                    <line x1="30" y1="140" x2="525" y2="140" />
+                </g>
+                <!-- Sleep Line (Blue) -->
+                <polyline id="sleepLine" fill="none" stroke="#5a82a6" stroke-width="2" stroke-dasharray="4,3" th:attr="points=${stats.sleepPolylinePoints}" />
+                <!-- Energy Line (Green) -->
+                <polyline id="energyLine" fill="none" stroke="#497e6b" stroke-width="2.5" th:attr="points=${stats.energyPolylinePoints}" />
+                <!-- Stress Line (Terracotta) -->
+                <polyline id="line" fill="none" stroke="#e28743" stroke-width="3" th:attr="points=${stats.chartPolylinePoints}" />
+                
+                <g id="dots">
+                    <circle th:each="dot : ${stats.chartDots}" 
+                            th:attr="cx=${dot.cx},cy=${dot.cy}" r="5" fill="#e28743" stroke="#fff" stroke-width="2">
+                        <title th:text="${dot.label} + ' on ' + ${dot.date}"></title>
+                    </circle>
+                    <text th:each="dot : ${stats.chartDots}"
+                          th:attr="x=${dot.cx},y=160" font-size="9" fill="#7b8982" text-anchor="middle" font-weight="600"
+                          th:text="${#strings.length(dot.date) >= 6 ? #strings.substring(dot.date, 0, 6) : dot.date}"></text>
+                </g>
+                <text x="4" y="24" font-size="9" fill="#889890" font-weight="600">10</text>
+                <text x="4" y="64" font-size="9" fill="#889890">7</text>
+                <text x="4" y="104" font-size="9" fill="#889890">4</text>
+                <text x="4" y="144" font-size="9" fill="#889890" font-weight="600">1</text>
+            </svg>
+            <p class="tiny center" style="margin-top: 8px;">Solid orange line: Stress · Solid green line: Energy · Dashed blue line: Sleep</p>
+        </div>
+
+        <!-- Gemini AI / Heuristic Pattern Insight -->
+        <div class="ai-insight-panel" style="margin-bottom: 30px;">
+            <div class="ai-badge-icon" th:text="${geminiConfigured ? '✨' : '🌿'}">✨</div>
+            <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 15px;" th:text="${geminiConfigured ? 'Gemini AI Pattern Analysis' : 'Algorithmic Pattern Analysis (Demo Mode)'}">Pattern Analysis</h4>
+                    <span class="pill pill-ai" th:if="${geminiConfigured}">Gemini Online</span>
+                    <span class="pill" th:unless="${geminiConfigured}">Algorithmic Mode</span>
+                </div>
+                <p style="margin: 0; line-height: 1.6; font-size: 13px;" th:text="${stats.aiPatternAnalysis}">
+                    Analyzing your SQLite history for well-being habits and correlations...
+                </p>
+            </div>
+        </div>
+
+        <!-- Feature 4: Personalized Suggestions Section -->
+        <section style="margin-bottom: 35px;">
+            <div class="heading" style="margin-bottom: 18px;">
+                <div>
+                    <p class="eyebrow">TAILORED SUPPORT FOR YOU</p>
+                    <h3 style="margin: 0; font-size: 20px;">Personalized Practical Suggestions</h3>
+                    <p class="muted small">Evidence-informed micro-actions based on your logged metrics. <em>(Not a medical or mental health diagnosis)</em></p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px;">
+                <div class="panel suggestion-card" th:each="s : ${stats.personalizedSuggestions}" style="display: flex; flex-direction: column; justify-content: space-between; padding: 22px; border: 1px solid var(--line);">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                            <span style="font-size: 28px;" th:text="${s.icon}">🫁</span>
+                            <span class="pill" th:text="${s.category}">Breathwork</span>
+                        </div>
+                        <h4 style="margin: 0 0 8px; font-size: 16px; color: var(--ink);" th:text="${s.title}">Box Breathing</h4>
+                        <p style="font-size: 13px; color: #364e44; line-height: 1.6; margin-bottom: 14px;" th:text="${s.recommendation}">
+                            Practice 4 cycles of Box Breathing.
+                        </p>
+                        <!-- Explanation of Why It Helps -->
+                        <div style="background: #f7faf8; border-left: 3px solid var(--green); padding: 10px 12px; border-radius: 6px; font-size: 12px; color: #496357; line-height: 1.5; margin-bottom: 16px;">
+                            <strong style="color: var(--green-dark); display: block; margin-bottom: 2px;">💡 Why this helps:</strong>
+                            <span th:text="${s.whyItHelps}">Controlled breathing triggers the vagus nerve.</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 12px;">
+                        <small style="color: var(--muted); font-size: 11px;" th:text="${s.triggerReason}">Trigger</small>
+                        <a th:href="@{${s.actionLink}}" class="navbtn-ghost" style="padding: 6px 12px; font-size: 12px; font-weight: 700;" th:text="${s.actionLabel}">
+                            Take Action &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Check-in Table -->
+        <div class="panel">
+            <div class="row" style="margin-bottom: 16px;">
+                <div>
+                    <h3 style="margin: 0;">Recent Check-in Log</h3>
+                    <p class="muted small" style="margin: 2px 0 0;">Latest entries from SQLite (mindmate.db)</p>
+                </div>
+                <a th:href="@{/history}" class="navbtn-ghost">View Full History &amp; Export (CSV / JSON) &rarr;</a>
+            </div>
+
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Mood</th>
+                            <th>Stress</th>
+                            <th>Sleep</th>
+                            <th>Workload</th>
+                            <th>Energy</th>
+                            <th>Signal</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(stats.recentCheckIns)}">
+                            <td colspan="8" style="text-align: center; color: #8a9690; padding: 35px;">
+                                No check-ins recorded yet. <a th:href="@{/#checkin}" style="color: var(--green); text-decoration: underline;">Record your first check-in &rarr;</a>
+                            </td>
+                        </tr>
+                        <tr th:each="c : ${stats.recentCheckIns}">
+                            <td th:text="${#temporals.format(c.createdAt, 'MMM d, HH:mm')}">Date</td>
+                            <td>
+                                <span th:text="${(c.moodEmoji != null ? c.moodEmoji : '😐') + ' ' + (c.moodLabel != null ? c.moodLabel : 'Okay')}">😐 Okay</span>
+                            </td>
+                            <td><strong th:text="${c.stress} + '/10'">5/10</strong></td>
+                            <td th:text="${c.sleep} + 'h'">7h</td>
+                            <td th:text="${c.workload} + '/10'">6/10</td>
+                            <td th:text="${c.energy} + '/10'">6/10</td>
+                            <td>
+                                <span class="pill" th:classappend="${c.signalClass}" th:text="${c.signal}">Steady</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <a th:href="@{'/reflection/' + ${c.id}}" class="navbtn-ghost" style="padding: 3px 8px; font-size: 11px;">View</a>
+                                    <a th:href="@{'/reflection/' + ${c.id} + '/download'}" class="navbtn-ghost" style="padding: 3px 8px; font-size: 11px;">JSON</a>
+                                    <form th:action="@{'/checkin/' + ${c.id} + '/delete'}" method="post" onsubmit="return confirm('Delete this record?');" style="margin: 0;">
+                                        <button type="submit" class="navbtn-ghost" style="padding: 3px 8px; font-size: 11px; color: #c4382c;">&times;</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

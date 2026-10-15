@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Settings & Configuration')}"></head>
+<body>
+
+    <header th:replace="~{fragments/layout :: header('settings')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main class="wrap" style="padding-top: 40px; padding-bottom: 90px;">
+        <div class="heading">
+            <div>
+                <p class="eyebrow">CONFIGURATION &amp; ENVIRONMENT</p>
+                <h2>System Settings</h2>
+                <p class="muted">Manage your Google Gemini AI API key and inspect the SQLite database.</p>
+            </div>
+        </div>
+
+        <div class="cols">
+            <!-- Gemini Settings Panel -->
+            <div class="panel">
+                <div class="row">
+                    <div>
+                        <h3>Google Gemini AI Setup</h3>
+                        <p class="muted small">Configured dynamically or via environment variable</p>
+                    </div>
+                    <span class="pill pill-ai" th:if="${isConfigured}">Active</span>
+                    <span class="pill" th:unless="${isConfigured}">Offline Fallback</span>
+                </div>
+
+                <form th:action="@{/settings/gemini}" method="post">
+                    <div class="form-group">
+                        <label for="apiKey">Gemini API Key</label>
+                        <input id="apiKey" name="apiKey" type="password" 
+                               th:placeholder="${isConfigured ? 'Key is set (' + maskedKey + ') - leave empty to keep' : 'Enter AIzaSy...'}">
+                        <p class="tiny" style="margin-top: 4px;">
+                            Get a free API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color: var(--green); text-decoration: underline;">Google AI Studio</a>.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="model">Select Gemini Model</label>
+                        <select id="model" name="model">
+                            <option value="gemini-1.5-flash" th:selected="${model == 'gemini-1.5-flash'}">gemini-1.5-flash (Fast &amp; Recommended)</option>
+                            <option value="gemini-1.5-pro" th:selected="${model == 'gemini-1.5-pro'}">gemini-1.5-pro (High reasoning)</option>
+                            <option value="gemini-2.0-flash" th:selected="${model == 'gemini-2.0-flash'}">gemini-2.0-flash (Next gen)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn full">Save AI Configuration &rarr;</button>
+                </form>
+
+                <div style="margin-top: 20px; padding: 14px; background: #f6faf7; border-radius: 12px; font-size: 12px; line-height: 1.7;">
+                    <strong>Tip:</strong> You can also set the environment variable <code>GEMINI_API_KEY</code> or define <code>gemini.api.key</code> in <code>application.properties</code>.
+                </div>
+            </div>
+
+            <!-- Database & Architecture Info -->
+            <div class="panel">
+                <div class="row">
+                    <div>
+                        <h3>Database &amp; Tech Stack</h3>
+                        <p class="muted small">Active local configuration</p>
+                    </div>
+                    <span class="pill">SQLite</span>
+                </div>
+
+                <div style="display: grid; gap: 14px; margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Database Engine</span>
+                        <span class="pill">SQLite 3.x (Xerial JDBC)</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Database File</span>
+                        <code style="font-size: 12px; background: #f0f4f1; padding: 2px 6px; border-radius: 4px;">mindmate.db</code>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Database Status</span>
+                        <span class="pill" th:text="${dbExists ? 'Active (' + dbSizeKb + ' KB)' : 'Initialized in memory/file'}">Active</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Stored Check-ins</span>
+                        <span class="pill" th:text="${totalCheckIns} + ' records'">0 records</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600;">Framework &amp; UI</span>
+                        <span class="pill">Spring Boot 3 + Thymeleaf MVC</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; padding: 14px; background: #fafcfb; border: 1px solid var(--line); border-radius: 12px;">
+                    <h4 style="margin: 0 0 6px; font-size: 13px;">Authentication Mode</h4>
+                    <p style="font-size: 12px; color: #5a7065; margin: 0; line-height: 1.6;">
+                        Optional user accounts are supported via session-based auth with BCrypt hashing. Guest mode is also fully active out-of-the-box.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

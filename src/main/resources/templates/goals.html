@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Well-being Goals & Habits')}"></head>
+<body>
+
+    <header th:replace="~{fragments/layout :: header('goals')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main class="wrap" style="padding-top: 35px; padding-bottom: 90px;">
+        <div class="heading">
+            <div>
+                <p class="eyebrow">DAILY INTENTIONS</p>
+                <h2>Small steps, zero pressure.</h2>
+                <p class="muted">Set gentle, realistic well-being goals. Progress in well-being is about self-compassion, not perfectionism.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a th:href="@{/dashboard}" class="navbtn-ghost">Dashboard ↗</a>
+                <a th:href="@{/#checkin}" class="navbtn-ghost">Daily Check-in ↗</a>
+            </div>
+        </div>
+
+        <!-- Weekly Progress Card with Positive Feedback -->
+        <div class="panel progress-card" style="margin-bottom: 30px; background: #fdfefe; border: 1px solid var(--line);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 18px;">Your Progress Snapshot</h3>
+                    <p class="muted small" style="margin: 4px 0 0;">
+                        Completed <strong th:text="${stats.completedCount}">0</strong> of <strong th:text="${stats.totalCount}">0</strong> daily well-being intentions (<span th:text="${stats.percent} + '%'">0%</span>)
+                    </p>
+                </div>
+                <span class="pill pill-ai" style="font-size: 13px;">Positive Pacing</span>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-track" style="width: 100%; height: 12px; background: #e8efe9; border-radius: 999px; overflow: hidden; margin-bottom: 16px;">
+                <div class="progress-fill" id="goalProgressBar" 
+                     th:style="'width: ' + ${stats.percent} + '%; height: 100%; background: linear-gradient(90deg, #497e6b, #6ab198); border-radius: 999px; transition: width 0.4s ease;'">
+                </div>
+            </div>
+
+            <!-- Warm Encouraging Feedback Badge -->
+            <div class="feedback-badge" style="display: flex; align-items: center; gap: 10px; background: #f2f7f3; padding: 12px 16px; border-radius: 12px;">
+                <span style="font-size: 20px;">🌱</span>
+                <p style="margin: 0; font-size: 13px; color: var(--green-dark); font-weight: 600;" th:text="${stats.feedbackMessage}">
+                    Every small step counts. Pick whatever feels most achievable for you today.
+                </p>
+            </div>
+        </div>
+
+        <div class="cols" style="align-items: start;">
+            <!-- Left: Add New Goal Form & One-Click Ideas -->
+            <div>
+                <div class="panel" style="margin-bottom: 24px;">
+                    <h3 style="font-size: 16px; margin: 0 0 6px;">Add a Daily Intention</h3>
+                    <p class="muted small" style="margin-bottom: 16px;">Keep goals bite-sized and realistic for your energy level today.</p>
+
+                    <form th:action="@{/goals/add}" th:object="${goalForm}" method="post">
+                        <div class="form-group" style="margin-bottom: 14px;">
+                            <label for="goalTitle" style="font-size: 12px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 6px;">
+                                What small step would you like to take?
+                            </label>
+                            <input id="goalTitle" th:field="*{title}" placeholder="e.g., Drink a glass of water, 10-min walk, sleep by 11pm" required maxlength="200" autocomplete="off" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px;">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 18px;">
+                            <label for="goalCategory" style="font-size: 12px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 6px;">
+                                Category
+                            </label>
+                            <select id="goalCategory" th:field="*{category}" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff;">
+                                <option value="Mindfulness">Mindfulness &amp; Breathwork</option>
+                                <option value="Rest">Rest &amp; Sleep Routine</option>
+                                <option value="Hydration">Hydration &amp; Nourishment</option>
+                                <option value="Movement">Movement &amp; Fresh Air</option>
+                                <option value="Study Pacing">Study Pacing &amp; Breaks</option>
+                                <option value="Connection">Social Connection</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn full">+ Add Intention</button>
+                    </form>
+                </div>
+
+                <!-- One-Click Starter Ideas -->
+                <div class="panel" style="background: #fbfdfc;">
+                    <h4 style="font-size: 14px; margin: 0 0 10px; color: var(--green-dark);">💡 One-Click Micro-Habit Ideas</h4>
+                    <p class="muted small" style="margin-bottom: 12px;">Tap any suggestion to auto-fill your goal:</p>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" class="preset-goal-chip" data-title="Drink 2 liters of water throughout study hours" data-cat="Hydration">
+                            💧 Drink 2L water during study hours
+                        </button>
+                        <button type="button" class="preset-goal-chip" data-title="Take a 10-minute walk outside away from screens" data-cat="Movement">
+                            🚶 Take a 10-minute walk outside
+                        </button>
+                        <button type="button" class="preset-goal-chip" data-title="Put phone away 30 minutes before sleep" data-cat="Rest">
+                            🌙 Put phone away 30 min before sleep
+                        </button>
+                        <button type="button" class="preset-goal-chip" data-title="Take two intentional 5-minute study breaks" data-cat="Study Pacing">
+                            ⏱️ Take two 5-min study breaks
+                        </button>
+                        <button type="button" class="preset-goal-chip" data-title="Write down one win or positive moment from today" data-cat="Mindfulness">
+                            ✍️ Note one win from today
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Today's Goals List -->
+            <div class="panel">
+                <div class="row" style="margin-bottom: 16px;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 18px;">Your Active Intentions</h3>
+                        <p class="muted small" style="margin: 2px 0 0;">Check off completed items to track your pacing</p>
+                    </div>
+                    <span class="pill" th:text="${stats.totalCount} + ' goals'">0 goals</span>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(stats.goals)}" style="text-align: center; padding: 40px 20px; color: var(--muted);">
+                    <div style="font-size: 40px; margin-bottom: 12px;">🌱</div>
+                    <h4 style="margin: 0 0 6px; font-size: 16px; color: var(--ink);">No goals logged yet</h4>
+                    <p class="small" style="max-width: 340px; margin: 0 auto 16px;">
+                        Choose a one-click suggestion on the left to set your first gentle well-being intention.
+                    </p>
+                </div>
+
+                <!-- Goals Checklist -->
+                <div class="goals-checklist" style="display: grid; gap: 12px;">
+                    <div th:each="g : ${stats.goals}" class="goal-item" th:classappend="${g.completed ? 'completed' : ''}" 
+                         style="display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #fff; border: 1px solid var(--line); border-radius: 12px; transition: all 0.2s ease;">
+                        
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                            <input type="checkbox" class="goal-checkbox" th:attr="data-id=${g.id}" th:checked="${g.completed}" 
+                                   style="width: 18px; height: 18px; accent-color: var(--green); cursor: pointer;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="goal-title-text" th:text="${g.title}" th:style="${g.completed ? 'text-decoration: line-through; color: #88968e;' : 'font-weight: 600; color: var(--ink);'}">
+                                        Goal Title
+                                    </span>
+                                </div>
+                                <div style="display: flex; gap: 8px; margin-top: 4px; align-items: center;">
+                                    <span class="pill" style="font-size: 10px; padding: 2px 6px;" th:text="${g.category}">Mindfulness</span>
+                                    <small class="muted" style="font-size: 11px;" th:text="${#temporals.format(g.createdAt, 'MMM d, HH:mm')}">Date</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Button -->
+                        <form th:action="@{'/goals/' + ${g.id} + '/delete'}" method="post" style="margin: 0;">
+                            <button type="submit" class="navbtn-ghost" title="Delete goal" style="padding: 4px 8px; font-size: 12px; color: #b84438; border: none; background: transparent;">
+                                &times;
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <p class="tiny center" style="margin-top: 20px; color: var(--muted);">
+                    Data is stored in your local SQLite database (table: goals).
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

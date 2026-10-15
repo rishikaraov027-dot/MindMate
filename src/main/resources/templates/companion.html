@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('MindMate AI Companion')}"></head>
+<body>
+
+    <header th:replace="~{fragments/layout :: header('companion')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main class="wrap" style="padding-top: 35px; padding-bottom: 75px;">
+        <!-- Transparent AI / Demo Status Banner -->
+        <div class="banner banner-gemini-on" th:if="${geminiConfigured}" style="margin-bottom: 20px; border-radius: 12px; border: 1px solid #c9ebd3;">
+            <span>✨ <strong>Gemini AI Active:</strong> Running on Google Gemini with session memory saved in SQLite.</span>
+            <a th:href="@{/settings}">AI Settings &rarr;</a>
+        </div>
+        <div class="banner banner-gemini-off" th:unless="${geminiConfigured}" style="margin-bottom: 20px; border-radius: 12px; border: 1px solid #fae1ba; background: #fffcf7;">
+            <span>🌿 <strong>Demo Mode Active:</strong> MindMate is operating on thoughtful, contextual algorithmic heuristics (no external API key required). To connect live Google Gemini, add your key in <a th:href="@{/settings}" style="text-decoration: underline; font-weight: 700;">Settings</a>.</span>
+            <a th:href="@{/settings}">Configure API Key &rarr;</a>
+        </div>
+
+        <div class="heading">
+            <div>
+                <p class="eyebrow">EMPATHETIC STUDENT COMPANION</p>
+                <h2>A safe space to pause, reflect, and unpack.</h2>
+                <p class="muted">Discuss study stress, motivation dips, deadlines, and daily student pressures in confidence.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <form th:action="@{/companion/clear}" method="post" style="margin: 0;">
+                    <button type="submit" class="navbtn-ghost" onclick="return confirm('Clear your chat history for this session?');">
+                        Clear Conversation
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="cols" style="align-items: start;">
+            <!-- Left: Prompts & Urgent Help Box -->
+            <div>
+                <!-- Starter Prompts Panel -->
+                <div class="panel" style="margin-bottom: 20px;">
+                    <h3 style="font-size: 16px; margin: 0 0 8px;">Explore Topics</h3>
+                    <p class="muted small" style="margin-bottom: 14px;">Select any reflection prompt to begin:</p>
+                    
+                    <div class="prompts" style="margin: 0; display: flex; flex-direction: column; gap: 8px;">
+                        <button class="chip-btn" type="button" data-prompt="I'm feeling really stressed about upcoming exams and deadlines">
+                            “I'm feeling stressed about upcoming exams &amp; deadlines.” ↗
+                        </button>
+                        <button class="chip-btn" type="button" data-prompt="I keep procrastinating on my coursework and can't seem to focus">
+                            “I keep procrastinating and can't seem to focus.” ↗
+                        </button>
+                        <button class="chip-btn" type="button" data-prompt="I feel like an imposter and that everyone else is ahead of me">
+                            “I feel like an imposter and everyone else is ahead.” ↗
+                        </button>
+                        <button class="chip-btn" type="button" data-prompt="I feel lonely and disconnected from people at college">
+                            “I feel lonely and disconnected from people at college.” ↗
+                        </button>
+                        <button class="chip-btn" type="button" data-prompt="I'm running on very little sleep and feel completely burnt out">
+                            “I'm exhausted and feel completely burnt out.” ↗
+                        </button>
+                        <button class="chip-btn" type="button" data-prompt="Could you walk me through a quick calming breathing exercise?">
+                            “Can you guide me through a quick calming breath?” ↗
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Urgent Help & Safety Notice -->
+                <div class="panel" style="background: #fff8f8; border: 1px solid #f9dede;">
+                    <div style="display: flex; gap: 10px; align-items: start; margin-bottom: 8px;">
+                        <span style="font-size: 20px;">🆘</span>
+                        <div>
+                            <h4 style="margin: 0; font-size: 14px; color: #b8382c;">Need Urgent Support?</h4>
+                            <p style="margin: 4px 0 0; font-size: 12px; color: #6e2e26; line-height: 1.6;">
+                                MindMate is an automated well-being tool, <strong>not a medical, therapy, or crisis service</strong>.
+                            </p>
+                        </div>
+                    </div>
+                    <p style="font-size: 12px; color: #6e2e26; line-height: 1.6; margin: 0 0 10px;">
+                        If you are in distress or experiencing thoughts of self-harm, free confidential 24/7 help is available:
+                    </p>
+                    <ul style="margin: 0 0 10px 18px; padding: 0; font-size: 12px; color: #6e2e26; line-height: 1.6;">
+                        <li><strong>India:</strong> Tele-MANAS (14416) or KIRAN (1800-599-0019)</li>
+                        <li><strong>USA &amp; Canada:</strong> Dial or Text 988</li>
+                        <li><strong>UK:</strong> Call 111 (NHS) or 116 123 (Samaritans)</li>
+                        <li><strong>International:</strong> <a href="https://findahelpline.com/" target="_blank" rel="noopener" style="text-decoration: underline; font-weight: 700; color: #b8382c;">FindAHelpline.com ↗</a></li>
+                    </ul>
+                    <a th:href="@{/support}" class="navbtn-ghost" style="display: block; text-align: center; font-size: 11px; padding: 5px; color: #b8382c; border-color: #f5c4c0;">
+                        View Full Support Directory &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Interactive Chat Panel -->
+            <div class="panel chat" style="min-height: 540px;">
+                <div class="chathead">
+                    <div class="chathead-left">
+                        <span>✿</span>
+                        <div>
+                            <strong>MindMate Companion</strong>
+                            <small th:text="${geminiConfigured ? '● Google Gemini Active · SQLite Context' : '● Empathetic Demo Mode · Local Storage'}">● Active Mode</small>
+                        </div>
+                    </div>
+                    <span class="pill" th:text="'Session: ' + ${conversationId}">Session</span>
+                </div>
+
+                <input type="hidden" id="convId" th:value="${conversationId}">
+
+                <div id="messages" class="messages" style="min-height: 400px; max-height: 500px;">
+                    <!-- Default greeting -->
+                    <p class="bot">Hi there 🌱 I'm here to offer a calm, non-judgmental space to reflect. What has been occupying your mind today?</p>
+                    
+                    <!-- SQLite Stored History -->
+                    <p th:each="msg : ${messages}" 
+                       th:class="${msg.role == 'user' ? 'user' : 'bot'}" 
+                       th:text="${msg.content}">
+                    </p>
+                </div>
+
+                <!-- Chat Form with JS intercept and fallback form submit -->
+                <form id="chatForm" th:action="@{/companion/form-message}" method="post" class="chatform">
+                    <input id="chatInput" name="message" maxlength="300" placeholder="Type what's on your mind or choose a topic on the left..." required autocomplete="off">
+                    <button type="submit" aria-label="Send message">&uarr;</button>
+                </form>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px; color: var(--muted);">
+                    <span>🔒 Confidential session · Stored in local SQLite</span>
+                    <span>Educational tool · Non-clinical</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

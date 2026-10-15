@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Guided Breathing & Relaxation')}"></head>
+<body>
+
+    <header th:replace="~{fragments/layout :: header('relaxation')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <main class="wrap" style="padding-top: 35px; padding-bottom: 90px;">
+        <div class="heading">
+            <div>
+                <p class="eyebrow">NERVOUS SYSTEM REGULATION</p>
+                <h2>Guided Breathing &amp; Relaxation</h2>
+                <p class="muted">Evidence-based somatic exercises to down-regulate academic stress and restore cognitive clarity.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a th:href="@{/#checkin}" class="navbtn-ghost">Log Check-in ↗</a>
+                <a th:href="@{/dashboard}" class="navbtn-ghost">Dashboard ↗</a>
+            </div>
+        </div>
+
+        <!-- 3 Interactive Sections: Breathing, Grounding, Study-Break Timer -->
+        <div class="relaxation-grid" style="display: grid; grid-template-columns: 1fr; gap: 30px;">
+
+            <!-- Section 1: Animated Breathing Exercise -->
+            <div class="panel breathing-container" id="breathingSection" style="text-align: center; padding: 40px 20px;">
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <span class="pill" style="margin-bottom: 12px; display: inline-block;">Visual Breathwork Pacer</span>
+                    <h3 style="font-size: 24px; margin: 0 0 8px;">Box Breathing &amp; Relaxing Rhythm</h3>
+                    <p class="muted small" style="margin-bottom: 24px;">
+                        Paced breathing stimulates the vagus nerve and activates the parasympathetic response within 90 seconds.
+                    </p>
+
+                    <!-- Technique Selector -->
+                    <div class="technique-pills" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap;">
+                        <button type="button" class="btn light active" id="techniqueBoxBtn" style="padding: 8px 16px; font-size: 13px; font-weight: 700;">
+                            Box Breathing (4-4-4-4)
+                        </button>
+                        <button type="button" class="btn light" id="techniqueRelaxBtn" style="padding: 8px 16px; font-size: 13px; font-weight: 700;">
+                            4-7-8 Deep Calm
+                        </button>
+                    </div>
+
+                    <!-- Breathing Circle Visualizer -->
+                    <div class="breathing-circle-wrapper" style="margin: 20px auto 30px; position: relative; width: 260px; height: 260px; display: flex; align-items: center; justify-content: center;">
+                        <div class="breathing-halo" id="breathingHalo"></div>
+                        <div class="breathing-circle" id="breathingCircle">
+                            <span class="breathing-action" id="breathingAction">Ready</span>
+                            <span class="breathing-timer" id="breathingTimer">Press Start</span>
+                        </div>
+                    </div>
+
+                    <p class="breathing-cycle-count" id="cycleCountDisplay" style="font-size: 13px; color: var(--muted); margin-bottom: 24px;">
+                        Cycles completed: <strong>0</strong>
+                    </p>
+
+                    <!-- Breathing Controls -->
+                    <div class="breathing-controls" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                        <button type="button" class="btn" id="startBreatheBtn" style="min-width: 130px;">
+                            ▶ Start Breathing
+                        </button>
+                        <button type="button" class="btn light" id="pauseBreatheBtn" style="min-width: 100px;" disabled>
+                            ⏸ Pause
+                        </button>
+                        <button type="button" class="btn light" id="resetBreatheBtn" style="min-width: 100px;">
+                            ↺ Reset
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 25px; padding: 14px; background: #f6faf7; border-radius: 12px; font-size: 12px; color: #496357; text-align: left; line-height: 1.6;">
+                        <strong>💡 How to use:</strong> Sit upright with shoulders loose. Follow the circle expanding on your inhale, resting on hold, and gently contracting on your exhale. If you feel dizzy, return to normal breathing at any time.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-Column Section: Grounding & Study-Break Timer -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+
+                <!-- Section 2: 5-4-3-2-1 Sensory Grounding Tool -->
+                <div class="panel" id="grounding">
+                    <div class="row" style="margin-bottom: 14px;">
+                        <div>
+                            <span class="pill" style="margin-bottom: 6px; display: inline-block;">Somatic Grounding</span>
+                            <h3 style="margin: 0; font-size: 18px;">5-4-3-2-1 Sensory Reset</h3>
+                            <p class="muted small" style="margin: 4px 0 0;">Anchors your attention in the present moment when thoughts are racing.</p>
+                        </div>
+                        <button type="button" class="navbtn-ghost" id="resetGroundingBtn" style="font-size: 11px; padding: 4px 10px;">
+                            Reset Steps
+                        </button>
+                    </div>
+
+                    <div class="grounding-list" style="display: grid; gap: 12px;">
+                        <label class="grounding-item" style="display: flex; gap: 12px; align-items: start; padding: 12px; background: #fbfdfc; border: 1px solid var(--line); border-radius: 10px; cursor: pointer;">
+                            <input type="checkbox" class="grounding-check" style="margin-top: 4px; accent-color: var(--green);">
+                            <div style="flex: 1;">
+                                <strong style="font-size: 13px; color: var(--ink);">👁️ 5 Things You Can SEE</strong>
+                                <p class="muted small" style="margin: 2px 0 0;">Notice 5 specific objects around you—a pencil, a shadow, tree leaves, a corner of your screen, or coffee mug.</p>
+                            </div>
+                        </label>
+
+                        <label class="grounding-item" style="display: flex; gap: 12px; align-items: start; padding: 12px; background: #fbfdfc; border: 1px solid var(--line); border-radius: 10px; cursor: pointer;">
+                            <input type="checkbox" class="grounding-check" style="margin-top: 4px; accent-color: var(--green);">
+                            <div style="flex: 1;">
+                                <strong style="font-size: 13px; color: var(--ink);">✋ 4 Things You Can FEEL</strong>
+                                <p class="muted small" style="margin: 2px 0 0;">Feel your feet pressing into the floor, texture of your sleeves, back resting on the chair, cool desktop surface.</p>
+                            </div>
+                        </label>
+
+                        <label class="grounding-item" style="display: flex; gap: 12px; align-items: start; padding: 12px; background: #fbfdfc; border: 1px solid var(--line); border-radius: 10px; cursor: pointer;">
+                            <input type="checkbox" class="grounding-check" style="margin-top: 4px; accent-color: var(--green);">
+                            <div style="flex: 1;">
+                                <strong style="font-size: 13px; color: var(--ink);">👂 3 Things You Can HEAR</strong>
+                                <p class="muted small" style="margin: 2px 0 0;">Listen for distant traffic, a computer fan, birds outside, air conditioning, or your own breath.</p>
+                            </div>
+                        </label>
+
+                        <label class="grounding-item" style="display: flex; gap: 12px; align-items: start; padding: 12px; background: #fbfdfc; border: 1px solid var(--line); border-radius: 10px; cursor: pointer;">
+                            <input type="checkbox" class="grounding-check" style="margin-top: 4px; accent-color: var(--green);">
+                            <div style="flex: 1;">
+                                <strong style="font-size: 13px; color: var(--ink);">👃 2 Things You Can SMELL</strong>
+                                <p class="muted small" style="margin: 2px 0 0;">Notice coffee, paper, fresh air through an open window, or take a deep neutral breath.</p>
+                            </div>
+                        </label>
+
+                        <label class="grounding-item" style="display: flex; gap: 12px; align-items: start; padding: 12px; background: #fbfdfc; border: 1px solid var(--line); border-radius: 10px; cursor: pointer;">
+                            <input type="checkbox" class="grounding-check" style="margin-top: 4px; accent-color: var(--green);">
+                            <div style="flex: 1;">
+                                <strong style="font-size: 13px; color: var(--ink);">👅 1 Thing You Can TASTE</strong>
+                                <p class="muted small" style="margin: 2px 0 0;">Take a sip of cool water, a mint, or simply notice the neutral taste in your mouth.</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div id="groundingFeedback" style="display: none; margin-top: 15px; padding: 12px; background: #eef6f0; border-radius: 10px; text-align: center; font-size: 13px; color: var(--green-dark); font-weight: 600;">
+                        ✨ Grounding complete! Notice how your awareness has centered back into the physical room.
+                    </div>
+                </div>
+
+                <!-- Section 3: Study-Break & Focus Timer -->
+                <div class="panel" id="timer" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div class="row" style="margin-bottom: 12px;">
+                            <div>
+                                <span class="pill" style="margin-bottom: 6px; display: inline-block;">Paced Productivity</span>
+                                <h3 style="margin: 0; font-size: 18px;">Study-Break &amp; Focus Timer</h3>
+                                <p class="muted small" style="margin: 4px 0 0;">Prevent fatigue accumulation with structured work-rest intervals.</p>
+                            </div>
+                        </div>
+
+                        <!-- Presets -->
+                        <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+                            <button type="button" class="btn light timer-preset-btn active" data-minutes="5" style="padding: 6px 12px; font-size: 12px;">
+                                5-Min Breather
+                            </button>
+                            <button type="button" class="btn light timer-preset-btn" data-minutes="15" style="padding: 6px 12px; font-size: 12px;">
+                                15-Min Stretch
+                            </button>
+                            <button type="button" class="btn light timer-preset-btn" data-minutes="25" data-type="focus" style="padding: 6px 12px; font-size: 12px;">
+                                25-Min Focus Sprint
+                            </button>
+                        </div>
+
+                        <!-- Timer Display -->
+                        <div class="timer-display-box" style="text-align: center; padding: 25px 0; background: #fbfdfc; border: 1px dashed var(--line); border-radius: 16px; margin-bottom: 20px;">
+                            <span id="timerStatusLabel" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; display: block; margin-bottom: 6px;">
+                                Rest Interval
+                            </span>
+                            <div id="timerCountdown" style="font-size: 52px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: -1px;">
+                                05:00
+                            </div>
+                            <p class="tiny muted" id="timerTip" style="margin-top: 6px;">
+                                Step away from your chair, look at distant trees, or stretch.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Timer Controls -->
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="btn" id="startTimerBtn" style="flex: 1;">
+                            ▶ Start Timer
+                        </button>
+                        <button type="button" class="btn light" id="pauseTimerBtn" style="flex: 1;" disabled>
+                            ⏸ Pause
+                        </button>
+                        <button type="button" class="btn light" id="resetTimerBtn" style="padding: 10px 14px;">
+                            ↺ Reset
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
