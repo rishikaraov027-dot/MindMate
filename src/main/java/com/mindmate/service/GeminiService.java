@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mindmate.config.GeminiConfig;
+import com.mindmate.config.IbmAiConfig;
 import com.mindmate.dto.AiReflectionResponse;
 import com.mindmate.entity.ChatMessage;
 import com.mindmate.entity.CheckIn;
@@ -29,14 +30,16 @@ public class GeminiService {
     );
 
     private final GeminiConfig geminiConfig;
+    private final IbmAiConfig ibmAiConfig;
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
 
-    public GeminiService(GeminiConfig geminiConfig, ObjectMapper objectMapper) {
+    public GeminiService(GeminiConfig geminiConfig, IbmAiConfig ibmAiConfig, ObjectMapper objectMapper) {
         this.geminiConfig = geminiConfig;
+        this.ibmAiConfig = ibmAiConfig;
         this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10))
+                .connectTimeout(Duration.ofSeconds(3))
                 .build();
     }
 
@@ -64,6 +67,15 @@ public class GeminiService {
     }
 
     public AiReflectionResponse generateReflection(int moodScore, String moodLabel, int stress, int sleep, int workload, int energy, int connection, String notes) {
+        // Priority 1: IBM Hybrid AI Tier (XGBoost + PyTorch + Granite) via microservice
+        if (ibmAiConfig.isEnabled()) {
+            AiReflectionResponse ibmRes = callIbmAiReflection(moodScore, moodLabel, stress, sleep, workload, energy, connection, notes);
+            if (ibmRes != null) {
+                return ibmRes;
+            }
+        }
+
+        // Priority 2: Google Gemini (if API key is configured)
         if (!geminiConfig.isConfigured()) {
             return generateLocalReflection(moodScore, moodLabel, stress, sleep, workload, energy, connection, notes, false);
         }
@@ -113,13 +125,22 @@ public class GeminiService {
     }
 
     /**
-     * Generate companion chat reply using Gemini API with conversational context.
+     * Generate companion chat reply using IBM Granite / Gemini API with conversational context.
      */
     public String generateChatReply(String userMessage, List<ChatMessage> history) {
         if (isCrisisInput(userMessage)) {
             return getCrisisResponse();
         }
 
+        // Priority 1: IBM Granite microservice
+        if (ibmAiConfig.isEnabled()) {
+            String ibmReply = callIbmAiChat(userMessage, history);
+            if (ibmReply != null) {
+                return ibmReply;
+            }
+        }
+
+        // Priority 2: Google Gemini (if API key is configured)
         if (!geminiConfig.isConfigured()) {
             return generateLocalChatReply(userMessage);
         }
@@ -222,6 +243,87 @@ public class GeminiService {
         }
 
         return "Notice what helps you feel more balanced each day. You're building great self-awareness!";
+    }
+
+    /**
+     * Direct HTTP request to IBM AI Engine microservice (XGBoost + PyTorch + Granite).
+     */
+    private AiReflectionResponse callIbmAiReflection(int moodScore, String moodLabel, int stress, int sleep, int workload, int energy, int connection, String notes) {
+        try {
+            String endpoint = ibmAiConfig.getBaseUrl() + "/predict";
+            ObjectNode payload = objectMapper.createObjectNode();
+            payload.put("moodScore", moodScore);
+            payload.put("moodLabel", moodLabel != null ? moodLabel : "Okay");
+            payload.put("stress", stress);
+            payload.put("sleep", sleep);
+            payload.put("workload", workload);
+            payload.put("energy", energy);
+            payload.put("connection", connection);
+            payload.put("notes", notes != null ? notes : "");
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(endpoint))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
+                    .timeout(Duration.ofMillis(ibmAiConfig.getTimeoutMs()))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                JsonNode root = objectMapper.readTree(response.body());
+                String title = root.path("title").asText("Make space for yourself.");
+                String text = root.path("text").asText("Take a pause and notice what you need today.");
+                String signal = root.path("signal").asText("Some extra care");
+                String signalClass = root.path("signalClass").asText("care");
+                String tipTitle = root.path("tipTitle").asText("A gentle reset");
+                String tipBody = root.path("tipBody").asText("Take a five-minute breather away from your desk.");
+                return new AiReflectionResponse(title, text, signal, signalClass, tipTitle, tipBody, true);
+            } else {
+                log.warn("IBM AI Engine returned HTTP status {}", response.statusCode());
+            }
+        } catch (Exception e) {
+            log.warn("IBM AI Engine call failed ({}), falling back: {}", e.getClass().getSimpleName(), e.getMessage());
+        }
+        return null;
+    }
+
+    private String callIbmAiChat(String userMessage, List<ChatMessage> history) {
+        try {
+            String endpoint = ibmAiConfig.getBaseUrl() + "/chat";
+            ObjectNode payload = objectMapper.createObjectNode();
+            payload.put("message", userMessage);
+            ArrayNode historyArray = payload.putArray("history");
+            if (history != null) {
+                int start = Math.max(0, history.size() - 6);
+                for (int i = start; i < history.size(); i++) {
+                    ChatMessage msg = history.get(i);
+                    ObjectNode hNode = historyArray.addObject();
+                    hNode.put("role", msg.getRole());
+                    hNode.put("content", msg.getContent());
+                }
+            }
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(endpoint))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
+                    .timeout(Duration.ofMillis(ibmAiConfig.getTimeoutMs()))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                JsonNode root = objectMapper.readTree(response.body());
+                String reply = root.path("reply").asText(null);
+                if (reply != null && !reply.isBlank()) {
+                    return reply.trim();
+                }
+            } else {
+                log.warn("IBM AI Engine chat returned HTTP status {}", response.statusCode());
+            }
+        } catch (Exception e) {
+            log.warn("IBM AI Engine chat call failed ({}), falling back: {}", e.getClass().getSimpleName(), e.getMessage());
+        }
+        return null;
     }
 
     /**
