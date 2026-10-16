@@ -56,6 +56,12 @@
             <artifactId>hibernate-community-dialects</artifactId>
             <version>${hibernate-community.version}</version>
         </dependency>
+        <!-- H2 Database for Pure Java & Cross-Architecture (LinuxONE s390x) Execution -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         
         <!-- JSON Processing for Gemini API -->
         <dependency>

@@ -39,7 +39,9 @@ USER mindmate
 EXPOSE 8080
 
 ENV SERVER_PORT=8080
-ENV SPRING_DATASOURCE_URL=jdbc:sqlite:/app/data/mindmate.db
+ENV SPRING_DATASOURCE_URL=jdbc:h2:file:/app/data/mindmate;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=USER
+ENV SPRING_DATASOURCE_DRIVER=org.h2.Driver
+ENV SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.H2Dialect
 ENV IBM_AI_SERVICE_URL=http://ai-engine:5000
 
 HEALTHCHECK --interval=20s --timeout=5s --start-period=20s --retries=3 \
