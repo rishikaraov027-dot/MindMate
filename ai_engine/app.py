@@ -44,8 +44,8 @@ def health():
         "status": "UP",
         "service": "MindMate IBM Hybrid AI Engine",
         "frameworks": [
-            "XGBoost 2.0 (Structured Tabular Regression)",
-            "PyTorch 2.2 (Neural Text Emotion & Cognitive Strain)",
+            xgboost_predictor.framework_name,
+            pytorch_analyzer.framework_name,
             "IBM Granite (LLM Contextual Reasoning)"
         ],
         "hardware_target": "IBM LinuxONE (s390x) / z16",
