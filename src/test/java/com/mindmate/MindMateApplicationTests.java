@@ -120,4 +120,16 @@ class MindMateApplicationTests {
         assertNotNull(json);
         assertTrue(json.contains("MindMate AI"));
     }
+
+    @Test
+    void testIbmAiFallbackGracefulOperation() {
+        // Even when the Python service is offline, check-in reflection should gracefully return a valid response
+        var reflection = geminiService.generateReflection(4, "Good", 5, 8, 5, 7, 7, "Testing IBM fallback resilience");
+        assertNotNull(reflection);
+        assertNotNull(reflection.getTitle());
+        assertNotNull(reflection.getText());
+        assertNotNull(reflection.getSignal());
+        assertNotNull(reflection.getTipTitle());
+        assertNotNull(reflection.getTipBody());
+    }
 }
