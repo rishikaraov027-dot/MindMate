@@ -10,18 +10,6 @@
 
 ---
 
-## 🏆 IBM Datathon Scoring Alignment & Architecture Summary
-
-This repository adheres directly to the official **IBM Datathon Rubric**:
-
-| Evaluation Criterion | Score Potential | MindMate AI Implementation Highlights |
-| :--- | :---: | :--- |
-| **Technical Design** | **10 / 10** | • **2 Open-Source AI Frameworks**: **XGBoost 2.0** (tabular regression on academic metrics) + **PyTorch 2.2** (`StudentSentimentNet` Deep Neural Network on free-text reflections).<br>• **Containerized Deployment**: Multi-container `docker-compose.yml` (`web` Spring Boot + `ai-engine` Flask/PyTorch/XGBoost) ready for **Podman** / **Docker**.<br>• **LinuxONE Community Cloud (L1CC)**: Built for `s390x` multi-architecture deployment.<br>• **Hardware Acceleration**: Optimized for **IBM z16 Telum On-Chip AI Accelerator** (Integrated AI Unit for ultra-low latency inference).<br>• **Platform Security**: Hardened non-root containers (`appuser` UID 10001), zero client-exposed secrets, Pervasive Encryption ready. |
-| **Novelty & Originality** | **10 / 10** | • **Hybrid AI Design Pattern**: Combines structured tabular prediction with open-text affective classification, routed to **IBM Granite** for contextual empathetic reasoning.<br>• **100% Original Solution Code**: Clean enterprise Java 21 architecture coupled with an autonomous Python AI microservice; zero unedited reference notebooks.<br>• **Explainable AI (XAI)**: Quantifies contributing stressors (e.g. sleep deficit, workload, isolation) to provide students actionable clarity rather than black-box numbers. |
-| **Pitch & Delivery** | **10 / 10** | • **Structured 3-Minute Pitch Script**: Follows standard Datathon format (Problem, Persona "Alex", Live Demo Walkthrough, IBM Tech Stack, Team Roles).<br>• **Live Interactive Demo**: Ready for immediate judge evaluation on L1CC or local container. |
-
----
-
 ## 🧠 System Architecture: The Hybrid AI Tier
 
 MindMate pairs structured predictive models with generative LLM reasoning:
